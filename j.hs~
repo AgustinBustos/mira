@@ -5,17 +5,7 @@ import Data.List (lines)
 
 
 f<-readFile "todo.txt"
-ll=lines f
 --------------------------------------------------------------------HF
-Leaving GHCi.
-agus@agus-Inspiron-15-3567:~/Documents/ideas/jobs/mira$ cabal repl
-Build profile: -w ghc-9.6.7 -O1
-In order, the following will be built (use -v for more details):
- - mira-0.1.0.0 (interactive) (exe:mira) (first run)
-Preprocessing executable 'mira' for mira-0.1.0.0...
-GHCi, version 9.6.7: https://www.haskell.org/ghc/  :? for help
-[1 of 2] Compiling Main             ( app/Main.hs, interpreted )
-Ok, one module loaded.
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
 data State = ToDo | InProgress | Done deriving Show
@@ -23,6 +13,7 @@ data Description = Description (Maybe Int) (Maybe String) (Maybe Int) (Maybe Int
 data Task = Task Int State String Description deriving Show
 --------------------------------------------------------------------HF
 -------------------------------------------------------------------------------------------------------------------------------------------------HS# get state
+ll=lines f
 
 --  state
 length ll
@@ -55,7 +46,6 @@ getId row = num ;
     semiid=(splitPoints False $ (repl <$> row))!!0 ;
     num = read semiid :: Int ;
     repl '*' = ' ' ;
-    repl '-' = ' ' ;
     repl x= x
 
 getId row
@@ -65,7 +55,6 @@ getId row
 "1: map apis | 2 "
 re solved =splitComma (if isInside then h/='\"' else h=='\"') t
  where solved =splitPoints (if isInside then h/='\"' else h=='\"') t
-   repl x= x
 1
 -------------------------------------------------------------------------------------------------------------------------------------------------HS# get task
 row
@@ -79,9 +68,9 @@ task i
 
 
 --------------------------------------------------------------------HF
-"1: map apis | 2 "
-" map apis | 2 "
-" map apis "
+"12: airbyte in prod|13,2d"
+" airbyte in prod|13,2d"
+" airbyte in prod"
 -------------------------------------------------------------------------------------------------------------------------------------------------HS# get tags
 
 
@@ -154,7 +143,7 @@ user after
 --------------------------------------------------------------------HF
 "12: airbyte in prod|13,2d"
 d =splitBar (if isInside then h/='\"' else h=='\"') t
-<interactive>:56:21: error: [GHC-88464]
+<interactive>:58:21: error: [GHC-88464]
     Variable not in scope: checkChar :: Char -> [Char] -> Bool
 ["13","2d"]
 Just 13
@@ -165,64 +154,38 @@ Nothing
 CallStack (from HasCallStack):
   error, called at libraries/base/GHC/List.hs:1366:14 in base:GHC.List
   tooLarge, called at libraries/base/GHC/List.hs:1376:50 in base:GHC.List
-  !!, called at <interactive>:90:20 in interactive:Ghci42
+  !!, called at <interactive>:92:20 in interactive:Ghci41
 Nothing
 -------------------------------------------------------------------------------------------------------------------------------------------------HS# final
 
-row=ll!!3
+ll!!0=row
 row
-:t task
---
-getNode row = Task (getId row) (getState row) pretask2 desc ;
+
+
+getNode row = Task (getId row) (getState row) (task i) desc ;
   where ;
-    (_:[i]) = splitPoints False row ;
-    pretask = task i ;
-    pretask2 = case pretask of {(' ':x)-> x; x->x} ;
+    (_:[i])=splitPoints False row ;
     desc = if checkChar '|' row then d else NoDescription ;
       where ;
-        d = Description (conn after) (user after) (days after) (hier after) ;
-        (_:[semi]) = (splitBar False row)  ;
-        after=splitComma False semi 
+        d=Description (conn after) user2 (days after) (hier after) ;
+        (_:[semi]) =(splitBar False row)  ;
+        after=splitComma False semi ;
+	user2 = user after
+
+	-- user2 = case (user after) of Just (' ':x)-> Just x; Just x->Just x ; Nothing -> Nothing
 
 getNode $ row
 --------------------------------------------------------------------HF
-"3: google | 4,2d, 1h"
-task :: [Char] -> [Char]
- pretask of {(' ':x)-> x; x->x} ;    desc = if checkChar '|' row then d else NoDescription where ;        d = Description (conn after) (user after) (da
-ys after) (hier after) ;        (_:[semi]) = (splitBar False row)  ;        after=splitComma False semi 
-Task 3 ToDo "google " (Description (Just 4) Nothing (Just 2) (Just 1))
--------------------------------------------------------------------------------------------------------------------------------------------------HS# final
-
---getNode <$> ll
-row=ll!!0
-
-(_:[semi]) = (splitBar False row)  
-after=splitComma False semi 
-after
-conn after
-d = Description (conn after) (user after) (days after) (hier after) 
-
-(_:[i]) = splitPoints False row 
-i
-pretask = task i 
-pretask2 = case pretask of {(' ':x)-> x; x->x} 
-pretask2
-desc = if checkChar '|' row then d else NoDescription 
-desc
-
-getId row 
-
-getNode $ row
-d
+Display all 831 possibilities? (y or n)
+-------------------------------------------------------------------------------------------------------------------------------------------------HS
+(a:[g])=semi
+a
+g
+semi!!1
 --------------------------------------------------------------------HF
-[" 1"]
-Just 1
-" jira calculation | 1"
-"jira calculation "
-Description (Just 1) Nothing Nothing Nothing
-0
-Task 0 Done "jira calculation " (Description (Just 1) Nothing Nothing Nothing)
-Description (Just 1) Nothing Nothing Nothing
+"12: airbyte in prod"
+"13,2d"
+"*** Exception: <interactive>:403:1-9: Non-exhaustive patterns in function !!
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
 --------------------------------------------------------------------HF
