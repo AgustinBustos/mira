@@ -7,15 +7,6 @@ import Data.List (lines)
 f<-readFile "todo.txt"
 ll=lines f
 --------------------------------------------------------------------HF
-Leaving GHCi.
-agus@agus-Inspiron-15-3567:~/Documents/ideas/jobs/mira$ cabal repl
-Build profile: -w ghc-9.6.7 -O1
-In order, the following will be built (use -v for more details):
- - mira-0.1.0.0 (interactive) (exe:mira) (first run)
-Preprocessing executable 'mira' for mira-0.1.0.0...
-GHCi, version 9.6.7: https://www.haskell.org/ghc/  :? for help
-[1 of 2] Compiling Main             ( app/Main.hs, interpreted )
-Ok, one module loaded.
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
 data State = ToDo | InProgress | Done deriving Show
@@ -154,8 +145,6 @@ user after
 --------------------------------------------------------------------HF
 "12: airbyte in prod|13,2d"
 d =splitBar (if isInside then h/='\"' else h=='\"') t
-<interactive>:56:21: error: [GHC-88464]
-    Variable not in scope: checkChar :: Char -> [Char] -> Bool
 ["13","2d"]
 Just 13
 Just 2
@@ -165,7 +154,7 @@ Nothing
 CallStack (from HasCallStack):
   error, called at libraries/base/GHC/List.hs:1366:14 in base:GHC.List
   tooLarge, called at libraries/base/GHC/List.hs:1376:50 in base:GHC.List
-  !!, called at <interactive>:90:20 in interactive:Ghci42
+  !!, called at <interactive>:131:20 in interactive:Ghci61
 Nothing
 -------------------------------------------------------------------------------------------------------------------------------------------------HS# final
 
@@ -191,41 +180,21 @@ task :: [Char] -> [Char]
  pretask of {(' ':x)-> x; x->x} ;    desc = if checkChar '|' row then d else NoDescription where ;        d = Description (conn after) (user after) (da
 ys after) (hier after) ;        (_:[semi]) = (splitBar False row)  ;        after=splitComma False semi 
 Task 3 ToDo "google " (Description (Just 4) Nothing (Just 2) (Just 1))
--------------------------------------------------------------------------------------------------------------------------------------------------HS# final
+-------------------------------------------------------------------------------------------------------------------------------------------------HS# dates
+import Data.Time
+isWeekend d = wd == Saturday || wd == Sunday where wd = dayOfWeek d
+addWorkDays 0 d = d ;
+addWorkDays n d = if isWeekend d then addWorkDays n (addDays 1 d) else  addWorkDays (n - 1) (addDays 1 d)
 
---getNode <$> ll
-row=ll!!0
-
-(_:[semi]) = (splitBar False row)  
-after=splitComma False semi 
-after
-conn after
-d = Description (conn after) (user after) (days after) (hier after) 
-
-(_:[i]) = splitPoints False row 
-i
-pretask = task i 
-pretask2 = case pretask of {(' ':x)-> x; x->x} 
-pretask2
-desc = if checkChar '|' row then d else NoDescription 
-desc
-
-getId row 
-
-getNode $ row
-d
+start_date=fromGregorian 2025 12 17 :: Day 
+start_date
+addDays 7 start_date
+addWorkDays 7 start_date
+-- getNode <$> ll
 --------------------------------------------------------------------HF
-[" 1"]
-Just 1
-" jira calculation | 1"
-"jira calculation "
-Description (Just 1) Nothing Nothing Nothing
-0
-Task 0 Done "jira calculation " (Description (Just 1) Nothing Nothing Nothing)
-Description (Just 1) Nothing Nothing Nothing
--------------------------------------------------------------------------------------------------------------------------------------------------HS
-
---------------------------------------------------------------------HF
+2025-12-17
+2025-12-24
+2025-12-26
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
 --------------------------------------------------------------------HF
