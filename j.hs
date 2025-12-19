@@ -7,8 +7,9 @@ import Data.Time
 
 
 f<-readFile "todo.txt"
-ll=filter (\(h:_)->h/='#') $ lines f
 
+
+ll=filter (\(h:_)->h/='#') $ filter (\x->x/="") $ lines f
 ts=getNode <$> ll
 --------------------------------------------------------------------HF
 Ok, one module loaded.
@@ -30,55 +31,51 @@ addDays :: Integer -> Day -> Day
 2025-12-26
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
-doing_task=(filter (\x->case x of (Task  _ InProgress _ _) ->True ; _->False ) ts)!!0
+doing_tasks=(filter (\x->case x of (Task  _ InProgress _ _) ->True ; _->False ) ts)
+doing_tasks
+doing_task=doing_tasks!!1
 
-getConnId (Task _ _ _ (Description con _ _ _)) = con
+getConnId (Task _ _ _ (Description con _ _ _)) = con;
+getConnId (Task _ _ _ NoDescription) = Nothing
 getConnId doing_task
---------------------------------------------------------------------HF
-Just 17
--------------------------------------------------------------------------------------------------------------------------------------------------HS
 
+--------------------------------------------------------------------HF
+[Task 2 InProgress "shopify " (Description (Just 32) Nothing (Just 3) (Just 33)),Task 40 InProgress "fill gantt " (Description (Just 36) Nothing Nothin
+g Nothing)]
+Just 36
+-------------------------------------------------------------------------------------------------------------------------------------------------HS
 
 nextConn node=find (\(Task i _ _ _)->Just i== next) ts where next =  getConnId node
-:t doing_task
-:t nextConn doing_task
-:t nextConn <$> nextConn doing_task
-:t nextConn
--- :i Monad
--- :t nextConn >>= nextConn doing_task
-(Just doing_task >>= nextConn) >>=nextConn 
---------------------------------------------------------------------HF
-doing_task :: Task
-nextConn doing_task :: Maybe Task
-nextConn <$> nextConn doing_task :: Maybe (Maybe Task)
-nextConn :: Task -> Maybe Task
-Just (Task 1 ToDo "map apis " (Description (Just 2) Nothing Nothing (Just 1)))
--------------------------------------------------------------------------------------------------------------------------------------------------HS
+
 ordered Nothing = [];
 ordered start = start:ordered next where next= start >>=nextConn 
 os=ordered (Just doing_task)
+
+os
 --------------------------------------------------------------------HF
+[Just (Task 40 InProgress "fill gantt " (Description (Just 36) Nothing Nothing Nothing)),Just (Task 36 ToDo "ask cursor for data " (Description (Just 3
+8) Nothing Nothing Nothing)),Just (Task 38 ToDo "check if airbyte does some simplification" NoDescription)]
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
+simple (Just (Task i _ d (Description _ _ (Just x) _))) =(i,d,x);
+simple (Just (Task i _ d _)) =(i,d,0) 
 
-timedTasks=((\(Just (Task i _ _ (Description _ _ d _ )))->case d of Nothing ->(i,0);Just x -> (i,x))) <$> os
+-- timedTasks=((\(Just (Task i _ _ (Description _ _ d _ )))->case d of Nothing ->(i,0);Just x -> (i,x))) <$> os
+timedTasks=simple <$> os
 -- foldl timedTasks
 
 acc a [] = [];
-acc a ((i,days):t) = (i,a+days):acc (a+days) t
+acc a ((i,dd,days):t) = (i,dd,a+days):acc (a+days) t
 
-semifinal=(\(i,d)->(i,d `addWorkDays` start_date)) <$> (acc 0 timedTasks)
+semifinal=(\(i,dd,d)->(i,dd,d `addWorkDays` start_date)) <$> (acc 0 timedTasks)
 startandfinish last []=[];
-startandfinish last ((i,d):t)=(i,last,d):startandfinish d t
+startandfinish last ((i,dd,d):t)=(i,dd,last,d):startandfinish d t
 
 startandfinish start_date semifinal
 
 --------------------------------------------------------------------HF
-[(18,2025-12-17,2025-12-17),(17,2025-12-17,2025-12-17),(1,2025-12-17,2025-12-17),(2,2025-12-17,2025-12-20),(3,2025-12-20,2025-12-24),(4,2025-12-24,2025
--12-26),(5,2025-12-26,2025-12-30),(6,2025-12-30,2026-01-01),(7,2026-01-01,2026-01-06),(8,2026-01-06,2026-01-13),(9,2026-01-13,2026-01-20),(10,2026-01-2
-0,2026-01-23),(11,2026-01-23,2026-01-24),(12,2026-01-24,2026-01-28),(13,2026-01-28,2026-02-25)]
-semifinal :: [(Int, Day)]
-startandfinish :: t -> [(a, t)] -> [(a, t, t)]
+[(40,"fill gantt ",2025-12-17,2025-12-17),(36,"ask cursor for data ",2025-12-17,2025-12-17),(38,"check if airbyte does some simplification",2025-12-17,
+2025-12-17)]
 -------------------------------------------------------------------------------------------------------------------------------------------------HS
 
 --------------------------------------------------------------------HF
