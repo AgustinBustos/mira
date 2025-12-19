@@ -1,5 +1,8 @@
 module Main where
 
+import Data.List (lines,find)
+import Data.Time
+
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
 
@@ -112,4 +115,46 @@ getNode row = Task (getId row) (getState row) pretask2 desc
         (_:[semi]) = (splitBar False row)  
         after=splitComma False semi 
 
+--------------------------------------------------------------------HF
+-------------------------------------------------------------------------------------------------------------------------------------------------HS# dates
+isWeekend d = wd == Saturday || wd == Sunday where wd = dayOfWeek d
+
+addWorkDays 0 d = d 
+addWorkDays n d = if isWeekend d then addWorkDays n (addDays 1 d) else  addWorkDays (n - 1) (addDays 1 d)
+
+
+--------------------------------------------------------------------HF
+-------------------------------------------------------------------------------------------------------------------------------------------------HS
+
+getConnId (Task _ _ _ (Description con _ _ _)) = con
+getConnId (Task _ _ _ NoDescription) = Nothing
+
+nextConn ts node=find (\(Task i _ _ _)->Just i== next) ts where next =  getConnId node
+
+ordered ts Nothing = []
+ordered ts start = start:ordered ts next where next= start >>=nextConn ts
+--------------------------------------------------------------------HF
+-------------------------------------------------------------------------------------------------------------------------------------------------HS
+
+simple (Just (Task i _ d (Description _ _ (Just x) _))) =(i,d,x)
+simple (Just (Task i _ d _)) =(i,d,0) 
+
+
+acc a [] = []
+acc a ((i,dd,days):t) = (i,dd,a+days):acc (a+days) t
+
+startandfinish last []=[]
+startandfinish last ((i,dd,d):t)=(i,dd,last,d):startandfinish d t
+
+evilGetTimes ts start_date doing_task= startandfinish start_date semifinal 
+  where 
+    semifinal=(\(i,dd,d)->(i,dd,(fromIntegral d) `addDays` start_date)) <$> (acc 0 timedTasks)
+    timedTasks=simple <$> os
+    os=ordered ts (Just doing_task)
+
+getTimes ts start_date doing_task= startandfinish start_date semifinal 
+  where 
+    semifinal=(\(i,dd,d)->(i,dd,d `addWorkDays` start_date)) <$> (acc 0 timedTasks)
+    timedTasks=simple <$> os
+    os=ordered ts (Just doing_task)
 --------------------------------------------------------------------HF
